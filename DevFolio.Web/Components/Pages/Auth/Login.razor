@@ -1,0 +1,122 @@
+@page "/login"
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using DevFolio.Domain.Entities
+@using DevFolio.Infrastructure.Context
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+@* NOTE: InteractiveServer render mode is intentionally omitted here to allow standard HTTP form POST and Cookie writing via HttpContext *@
+
+<div class="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[120px]"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMSIvPjxwYXRoIGQ9Ik0wIDBMOCA4Wk04IDBMMCA4WiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wMiIvPjwvc3ZnPg==')]"></div>
+    </div>
+
+    <div class="w-full max-w-md bg-[#131313]/90 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl z-10 flex flex-col items-center">
+        
+        <div class="w-16 h-16 bg-black border border-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+            <span class="material-symbols-outlined text-4xl text-primary">login</span>
+        </div>
+
+        <h1 class="text-3xl font-bold mb-2 tracking-tight">Giriş Yap</h1>
+        <p class="text-white/50 text-sm mb-8 text-center">Yönetim paneline erişmek için oturum açın.</p>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="w-full bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 mb-6">
+                <span class="material-symbols-outlined text-sm">error</span>
+                <span>@ErrorMessage</span>
+            </div>
+        }
+
+        <EditForm Model="Model" OnValidSubmit="HandleLogin" FormName="loginForm" class="w-full space-y-5">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] uppercase tracking-widest text-white/50 font-bold ml-1">E-Posta Adresi</label>
+                <InputText @bind-Value="Model.Email" placeholder="ornek@devfolio.com" class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-3.5 text-white placeholder-white/20 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all shadow-inner" type="email" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] uppercase tracking-widest text-white/50 font-bold ml-1">Şifre</label>
+                <InputText @bind-Value="Model.Password" type="password" placeholder="••••••••" class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-3.5 text-white placeholder-white/20 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all shadow-inner" />
+            </div>
+
+            <button type="submit" class="w-full mt-8 bg-white text-black font-bold py-3.5 rounded-xl hover:bg-gray-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+                <span>Oturum Aç</span>
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+        </EditForm>
+
+        <div class="mt-8 text-center text-xs text-white/40">
+            Henüz bir hesabın yok mu? <a href="/register" class="text-white hover:text-primary transition-colors hover:underline">Kayıt Ol</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    public LoginModel Model { get; set; } = new();
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    private string? ErrorMessage;
+
+    public class LoginModel
+    {
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+
+    private async Task HandleLogin()
+    {
+        ErrorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(Model.Email) || string.IsNullOrWhiteSpace(Model.Password))
+        {
+            ErrorMessage = "Lütfen e-posta ve şifrenizi girin.";
+            return;
+        }
+
+        using var db = await DbFactory.CreateDbContextAsync();
+        
+        // Şifreler düz metin olarak karşılaştırılıyor (Plain Text). Daha sonra güvenlik için Identity ile güncellenebilir.
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == Model.Email.ToLower() && u.PasswordHash == Model.Password);
+
+        if (user == null)
+        {
+            ErrorMessage = "E-posta veya şifre hatalı.";
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role)
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+        };
+
+        if (HttpContext != null)
+        {
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+            NavigationManager.NavigateTo("/user/dashboard", forceLoad: true);
+        }
+        else
+        {
+            ErrorMessage = "Sistem Hatası: Çerez yazılamadı (HttpContext null). Form yapısını kontrol edin.";
+        }
+    }
+}

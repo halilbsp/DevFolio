@@ -27,13 +27,13 @@ else
         <div class="flex items-center gap-2">
             <span class="text-[#81ecff] font-black italic font-headline text-xl tracking-tighter">DevFolio</span>
         </div>
-        <div class="hidden md:flex items-center space-x-8">
-            <a class="font-headline uppercase tracking-widest text-sm text-primary border-b border-primary transition-all" href="#projects">Projeler</a>
-            <a class="font-headline uppercase tracking-widest text-sm text-neutral-400 hover:text-primary transition-all" href="#skills">Yetenekler</a>
-            <a class="font-headline uppercase tracking-widest text-sm text-neutral-400 hover:text-primary transition-all" href="#contact">İletişim</a>
+        <div class="hidden md:flex items-center space-x-8" data-enhance-nav="false">
+            <a class="font-headline uppercase tracking-widest text-sm text-primary border-b border-primary transition-all cursor-pointer" onclick="document.getElementById('projects').scrollIntoView({behavior: 'smooth'})">Projeler</a>
+            <a class="font-headline uppercase tracking-widest text-sm text-neutral-400 hover:text-primary transition-all cursor-pointer" onclick="document.getElementById('skills').scrollIntoView({behavior: 'smooth'})">Yetenekler</a>
+            <a class="font-headline uppercase tracking-widest text-sm text-neutral-400 hover:text-primary transition-all cursor-pointer" onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})">İletişim</a>
         </div>
-        <div class="flex items-center gap-6">
-            <a href="mailto:iletisim@devfolio.com" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-bold px-6 py-2 rounded-lg hover:scale-105 transition-transform shadow-[0_0_20px_rgba(129,236,255,0.2)]">
+        <div class="flex items-center gap-6" data-enhance-nav="false">
+            <a href="mailto:@(CurrentPortfolio.User?.Email ?? "")" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-headline font-bold px-6 py-2 rounded-lg hover:scale-105 transition-transform shadow-[0_0_20px_rgba(129,236,255,0.2)]">
                 İletişime Geç
             </a>
         </div>
@@ -53,8 +53,8 @@ else
                 <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl leading-relaxed">
                     @CurrentPortfolio.Bio
                 </p>
-                <div class="flex flex-wrap gap-4 pt-4">
-                    <a href="#projects" class="px-8 py-4 bg-primary text-on-primary-fixed font-headline font-bold rounded-xl shadow-[0px_10px_30px_rgba(129,236,255,0.2)] hover:scale-[1.02] transition-transform">
+                <div class="flex flex-wrap gap-4 pt-4" data-enhance-nav="false">
+                    <a class="px-8 py-4 bg-primary text-on-primary-fixed font-headline font-bold rounded-xl shadow-[0px_10px_30px_rgba(129,236,255,0.2)] hover:scale-[1.02] transition-transform cursor-pointer" onclick="document.getElementById('projects').scrollIntoView({behavior: 'smooth'})">
                         Projeleri İncele
                     </a>
                 </div>
@@ -155,7 +155,19 @@ else
                 }
             </div>
         </section>
+
+        <section id="contact" class="py-32 border-t border-white/5 text-center mt-12 bg-surface-container-lowest/50 rounded-3xl p-12 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent"></div>
+            <h2 class="font-headline text-4xl md:text-5xl font-bold mb-6 text-white relative z-10">Birlikte Çalışalım</h2>
+            <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto mb-10 relative z-10">Yeni projelerde işbirliği yapmak veya fikir alışverişinde bulunmak isterseniz bana ulaşabilirsiniz.</p>
+            <a href="mailto:@(CurrentPortfolio.User?.Email ?? "")" class="inline-flex items-center gap-3 px-10 py-5 bg-white text-black font-headline font-bold text-xl rounded-xl hover:scale-105 transition-all relative z-10 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                <span class="material-symbols-outlined">mail</span>
+                E-Posta Gönder
+            </a>
+        </section>
     </main>
+
+    <style> html { scroll-behavior: smooth; } </style>
 
     <div class="fixed bottom-8 right-8 z-40 hidden md:block">
         <div class="bg-[#131313] p-4 rounded-full flex items-center gap-4 border border-white/10 shadow-2xl backdrop-blur-xl">

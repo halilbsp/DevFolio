@@ -1,0 +1,26 @@
+@page "/logout"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject NavigationManager NavigationManager
+
+@* NOTE: SSR page to safely clear the HttpContext cookie *@
+
+<div class="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+    <span class="ml-4 font-headline">Güvenli çıkış yapılıyor...</span>
+</div>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (HttpContext != null)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+        
+        NavigationManager.NavigateTo("/", forceLoad: true);
+    }
+}

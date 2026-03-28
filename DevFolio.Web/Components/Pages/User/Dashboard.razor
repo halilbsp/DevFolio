@@ -1,11 +1,13 @@
 @page "/user/dashboard"
 @rendermode InteractiveServer
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @layout DevFolio.Web.Components.Layout.UserLayout
 @using DevFolio.Domain.Entities
 @using DevFolio.Application.Interfaces
 @using Microsoft.AspNetCore.Hosting
 @inject IPortfolioRepository PortfolioRepo
 @inject IWebHostEnvironment Env
+@inject AuthenticationStateProvider AuthStateProvider
 
 @if (CurrentPortfolio == null)
 {
@@ -205,7 +207,18 @@ else
 
     protected override async Task OnInitializedAsync() { await LoadData(); }
 
-    private async Task LoadData() { CurrentPortfolio = await PortfolioRepo.GetPortfolioByUsernameAsync("Halil"); }
+    private async Task LoadData() { 
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var userIdStr = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(userIdStr, out var userId))
+            {
+                CurrentPortfolio = await PortfolioRepo.GetPortfolioWithDetailsAsync(userId);
+            }
+        }
+    }
 
     private async Task SavePortfolio() {
         if (CurrentPortfolio != null) {

@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 
 <PageTitle>DevFolio | Profesyonel Varlığını İnşa Et</PageTitle>
 
@@ -24,10 +24,29 @@
         <div class="hidden md:flex items-center gap-8 font-headline text-sm tracking-tight">
             <a class="text-cyan-400 border-b-2 border-cyan-400 pb-1" href="#ozellikler">Özellikler</a>
             <a class="text-slate-400 hover:text-white transition-colors" href="#vitrin">Vitrin</a>
-            </div>
-        <a href="/user/dashboard" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-bold px-6 py-2 rounded-lg scale-95 active:scale-90 transition-transform font-headline text-sm">
-            Hemen Başla
-        </a>
+        </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="flex items-center gap-4">
+                    <a href="/user/dashboard" class="bg-surface-container-high border border-white/10 text-white font-bold px-6 py-2 rounded-lg hover:bg-white/5 transition-colors font-headline text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">dashboard</span>
+                        Kontrol Paneli
+                    </a>
+                    <a href="/logout" class="text-error hover:text-error-dim font-headline text-sm transition-colors font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">logout</span>
+                        Çıkış Yap
+                    </a>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="flex items-center gap-4">
+                    <a href="/login" class="text-slate-300 hover:text-white font-headline text-sm transition-colors font-bold">Giriş Yap</a>
+                    <a href="/register" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-bold px-6 py-2 rounded-lg scale-95 hover:scale-100 active:scale-90 transition-all font-headline text-sm shadow-[0_0_15px_rgba(129,236,255,0.2)] hover:shadow-[0_0_20px_rgba(129,236,255,0.4)]">
+                        Kayıt Ol
+                    </a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </nav>
 
@@ -47,12 +66,21 @@
                         Kıdemli .NET geliştiricilerinin Blazor ve MSSQL kullanarak seçkin portfolyolar oluşturması, yönetmesi ve sergilemesi için tasarlanmış, tamamen ücretsiz ve üretime hazır platform.
                     </p>
                     <div class="flex flex-wrap gap-4">
-                        <a href="/user/dashboard" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-8 py-4 rounded-lg font-headline font-bold text-lg hover:shadow-[0_0_30px_rgba(129,236,255,0.3)] transition-all">
-                            Portfolyonu Yayınla
+                        <AuthorizeView>
+                            <Authorized>
+                                <a href="/user/dashboard" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-8 py-4 rounded-lg font-headline font-bold text-lg hover:shadow-[0_0_30px_rgba(129,236,255,0.3)] transition-all">
+                                    Kontrol Paneline Git
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a href="/register" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-8 py-4 rounded-lg font-headline font-bold text-lg hover:shadow-[0_0_30px_rgba(129,236,255,0.3)] transition-all">
+                                    Hemen Portfolyonu Başlat
+                                </a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                        <a href="/halil" class="px-8 py-4 rounded-lg font-headline font-bold text-lg border border-outline-variant/30 hover:bg-white/5 transition-all text-on-surface">
+                            Demo Portfolyoyu İncele
                         </a>
-                        <button class="px-8 py-4 rounded-lg font-headline font-bold text-lg border border-outline-variant/30 hover:bg-white/5 transition-all text-on-surface">
-                            Dokümantasyon
-                        </button>
                     </div>
                 </div>
 
@@ -228,9 +256,18 @@
             <h2 class="text-4xl md:text-5xl font-headline font-bold mb-8 tracking-tighter">Kendi <span class="text-primary">Başyapıtını</span> yayınlamaya hazır mısın?</h2>
             <p class="text-on-surface-variant text-lg mb-12">Profesyonel dijital varlıkları için DevFolio altyapısına güvenen yüzlerce kıdemli mimara (architect) katıl.</p>
             <div class="flex flex-col sm:flex-row justify-center gap-6">
-                <a href="/user/dashboard" class="bg-primary text-on-primary-fixed font-bold font-headline px-10 py-5 rounded-lg text-xl hover:shadow-[0_0_40px_rgba(129,236,255,0.4)] transition-all">
-                    Hemen Başla
-                </a>
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/user/dashboard" class="bg-primary text-on-primary-fixed font-bold font-headline px-10 py-5 rounded-lg text-xl hover:shadow-[0_0_40px_rgba(129,236,255,0.4)] transition-all">
+                            Paneline Git
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/register" class="bg-primary text-on-primary-fixed font-bold font-headline px-10 py-5 rounded-lg text-xl hover:shadow-[0_0_40px_rgba(129,236,255,0.4)] transition-all">
+                            Hemen Kayıt Ol
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
                 <a href="/halil" class="bg-transparent border border-outline-variant text-on-surface font-bold font-headline px-10 py-5 rounded-lg text-xl hover:bg-white/5 transition-all">
                     Demo Portfolyoyu İncele
                 </a>

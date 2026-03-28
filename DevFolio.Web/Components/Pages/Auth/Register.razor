@@ -134,8 +134,8 @@
 
             await db.SaveChangesAsync(); // Transaction bütünlüğü
 
-            // Kayıt başarılı olduğunda kullanıcıyı paneline yönlendir
-            Navigation.NavigateTo("/user/dashboard", forceLoad: false);
+            // Kayıt başarılı olduğunda kullanıcıyı giriş yapması için login sayfasına yönlendir
+            Navigation.NavigateTo("/login", forceLoad: true);
         }
         catch (Exception ex)
         {
