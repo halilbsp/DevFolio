@@ -1,0 +1,258 @@
+@page "/admin/dashboard"
+@rendermode InteractiveServer
+@layout DevFolio.Web.Components.Admin.AdminLayout
+@using DevFolio.Infrastructure.Context
+@using DevFolio.Domain.Entities
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+@if (isLoading)
+{
+    <div class="flex h-full items-center justify-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+    </div>
+}
+else
+{
+    <header class="mb-12 flex justify-between items-end">
+        <div>
+            <h2 class="font-headline text-4xl font-bold tracking-tight text-on-surface">Sistem Gösterge Paneli</h2>
+            <p class="text-on-surface-variant mt-2 font-medium tracking-wide text-xs uppercase">METRİKLER GERÇEK ZAMANLI GÜNCELLENDİ: @DateTime.Now.ToString("HH:mm")</p>
+        </div>
+        <div class="flex gap-4">
+            <button @onclick="OpenAddUserModal" class="px-6 py-2 rounded-md font-headline font-bold text-sm bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                YENİ KULLANICI EKLE
+            </button>
+        </div>
+    </header>
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="relative group overflow-hidden rounded-xl bg-surface-container border border-outline-variant/5 p-8 transition-all hover:bg-surface-container-high">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span class="material-symbols-outlined text-7xl">group</span></div>
+            <p class="text-on-surface-variant font-headline text-xs tracking-[0.2em] mb-4 uppercase">Kayıtlı Geliştirici</p>
+            <h3 class="text-5xl font-headline font-bold text-primary">@totalUsers</h3>
+        </div>
+        <div class="relative group overflow-hidden rounded-xl bg-surface-container border border-outline-variant/5 p-8 transition-all hover:bg-surface-container-high">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span class="material-symbols-outlined text-7xl">visibility</span></div>
+            <p class="text-on-surface-variant font-headline text-xs tracking-[0.2em] mb-4 uppercase">Aktif Portfolyo</p>
+            <h3 class="text-5xl font-headline font-bold text-secondary">@totalPortfolios</h3>
+        </div>
+        <div class="relative group overflow-hidden rounded-xl bg-surface-container border border-outline-variant/5 p-8 transition-all hover:bg-surface-container-high">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span class="material-symbols-outlined text-7xl">terminal</span></div>
+            <p class="text-on-surface-variant font-headline text-xs tracking-[0.2em] mb-4 uppercase">Yüklenen Projeler</p>
+            <h3 class="text-5xl font-headline font-bold text-white">@totalProjects</h3>
+        </div>
+    </section>
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        
+        <div class="xl:col-span-8 bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 flex flex-col">
+            <div class="px-8 py-6 flex justify-between items-center bg-surface-container">
+                <h3 class="font-headline font-bold text-lg flex items-center gap-2 text-white">
+                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>KULLANICI DİZİNİ
+                </h3>
+            </div>
+            
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-[10px] tracking-[0.15em] text-on-surface-variant uppercase bg-surface-container/50">
+                            <th class="px-8 py-4 font-semibold">Kullanıcı Kimliği</th>
+                            <th class="px-4 py-4 font-semibold">Endpoint (URL)</th>
+                            <th class="px-8 py-4 font-semibold text-right">Aksiyonlar</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-outline-variant/5">
+                        @if (recentPortfolios != null) {
+                            @foreach (var portfolio in recentPortfolios) {
+                                <tr class="hover:bg-surface-container-highest/30 transition-colors">
+                                    <td class="px-8 py-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg overflow-hidden border border-white/10 bg-black flex items-center justify-center">
+                                                @if(!string.IsNullOrEmpty(portfolio.ProfileImageUrl)){ <img class="w-full h-full object-cover" src="@portfolio.ProfileImageUrl" /> }
+                                                else { <span class="material-symbols-outlined text-on-surface-variant text-sm">person</span> }
+                                            </div>
+                                            <div><p class="font-bold text-white">@portfolio.FullName</p><p class="text-xs text-on-surface-variant">@portfolio.JobTitle</p></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-6 font-mono text-primary text-xs">
+                                        <a href="/@portfolio.FullName?.ToLower().Replace(" ", "")" target="_blank" class="hover:underline">/@portfolio.FullName?.ToLower().Replace(" ", "")</a>
+                                    </td>
+                                    <td class="px-8 py-6 text-right">
+                                        <button @onclick="() => DeleteUserAndPortfolio(portfolio)" class="p-2 hover:bg-error/20 text-on-surface-variant hover:text-error rounded-lg transition-colors"><span class="material-symbols-outlined text-lg">delete</span></button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="xl:col-span-4 glass-panel rounded-xl border border-white/5 p-6 bg-surface-container-lowest/40 flex flex-col h-full">
+            <h3 class="font-headline font-bold text-lg text-white mb-1">SİSTEM AKIŞI</h3>
+            <p class="text-[10px] text-on-surface-variant uppercase tracking-widest mb-6">Son Yüklenen Projeler</p>
+            <div class="space-y-6 flex-1">
+                @if (recentProjects != null && recentProjects.Any()) {
+                    @foreach (var project in recentProjects) {
+                        <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 transition-all border border-transparent hover:border-white/5">
+                            <div class="w-16 h-12 bg-black rounded border border-white/5 overflow-hidden flex justify-center items-center">
+                                @if(!string.IsNullOrEmpty(project.ImageUrl)) { <img src="@project.ImageUrl" class="w-full h-full object-cover" /> }
+                                else { <span class="material-symbols-outlined text-on-surface-variant opacity-50">terminal</span> }
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-sm text-white truncate">@project.Title</p>
+                                <p class="text-xs text-on-surface-variant truncate">@project.Tags</p>
+                            </div>
+                        </div>
+                    }
+                } else { <p class="text-xs text-on-surface-variant text-center mt-10">Henüz proje hareketi yok.</p> }
+            </div>
+        </div>
+    </div>
+
+    @if(isAddUserModalOpen)
+    {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="bg-[#131313] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-white/5 flex justify-between items-center bg-surface-container-low">
+                    <h2 class="font-headline text-xl font-bold text-white">Yeni Geliştirici Ekle</h2>
+                    <button @onclick="CloseAddUserModal" class="text-on-surface-variant hover:text-white"><span class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="p-8 space-y-6">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Email Adresi</label>
+                        <input @bind="newUserEmail" placeholder="ornek@devfolio.com" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary outline-none" />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Ad Soyad</label>
+                        <input @bind="newUserName" placeholder="Örn: Ahmet Yılmaz" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary outline-none" />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Geçici Şifre</label>
+                        <input @bind="newUserPassword" type="password" placeholder="******" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary outline-none" />
+                    </div>
+                </div>
+                <div class="p-6 border-t border-white/5 flex justify-end gap-4 bg-surface-container-low">
+                    <button @onclick="CloseAddUserModal" class="px-6 py-2.5 rounded text-on-surface-variant hover:text-white font-bold transition-all">İptal</button>
+                    <button @onclick="CreateNewUser" class="px-6 py-2.5 rounded bg-primary text-on-primary-fixed font-bold hover:bg-primary-container transition-all shadow-lg shadow-primary/20">
+                        Kullanıcıyı Oluştur
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private bool isLoading = true;
+
+    private int totalUsers = 0; private int totalPortfolios = 0; private int totalProjects = 0;
+    private List<Portfolio> recentPortfolios = new();
+    private List<Project> recentProjects = new();
+
+    // Yeni Kullanıcı Değişkenleri 🧑‍💻
+    private bool isAddUserModalOpen = false;
+    private string newUserEmail = "";
+    private string newUserName = "";
+    private string newUserPassword = "";
+
+    protected override async Task OnInitializedAsync() { await LoadDashboardData(); }
+
+    private async Task LoadDashboardData()
+    {
+        using var db = await DbFactory.CreateDbContextAsync();
+        totalUsers = await db.Users.CountAsync();
+        totalPortfolios = await db.Portfolios.CountAsync();
+        totalProjects = await db.Projects.CountAsync();
+
+        recentPortfolios = await db.Portfolios.Include(p => p.User).OrderByDescending(p => p.Id).Take(5).ToListAsync();
+        recentProjects = await db.Projects.OrderByDescending(p => p.Id).Take(4).ToListAsync();
+
+        isLoading = false;
+    }
+
+    private void OpenAddUserModal() { isAddUserModalOpen = true; newUserEmail = ""; newUserName = ""; newUserPassword = ""; }
+    private void CloseAddUserModal() { isAddUserModalOpen = false; }
+
+    // KURŞUN GEÇİRMEZ KULLANICI EKLEME METODU 🛡️🔥
+    private async Task CreateNewUser()
+    {
+        try
+        {
+            if(string.IsNullOrWhiteSpace(newUserEmail) || string.IsNullOrWhiteSpace(newUserName)) return;
+
+            // 1. Yeni Kullanıcıyı oluştur (Guid manuel atandı!)
+            var newUserId = Guid.NewGuid();
+            var user = new User 
+            { 
+                Id = newUserId,
+                Email = newUserEmail, 
+                PasswordHash = string.IsNullOrWhiteSpace(newUserPassword) ? "123456" : newUserPassword, 
+                Role = "Geliştirici" 
+            };
+            
+            using var db = await DbFactory.CreateDbContextAsync();
+            db.Users.Add(user);
+
+            // 2. Boş Portfolyoyu oluştur (Tüm zorunlu alanlar dolduruldu!)
+            var portfolio = new Portfolio 
+            { 
+                Id = Guid.NewGuid(),
+                UserId = newUserId, 
+                FullName = newUserName, 
+                JobTitle = "Yazılım Geliştirici", 
+                Bio = "Yeni portfolyomu oluşturuyorum.", 
+                ProfileImageUrl = "", 
+                ThemePreference = "Dark"
+            };
+            db.Portfolios.Add(portfolio);
+            await db.SaveChangesAsync(); // Hepsini tek tıkla ve tek bir transaction içinde kaydet!
+
+            // Modal'ı kapat ve verileri yenile
+            isAddUserModalOpen = false;
+            await LoadDashboardData();
+        }
+        catch (Exception ex)
+        {
+            // Eğer yine bir hata olursa en azından konsolda nedenini görebileceğiz 🕵️‍♂️
+            Console.WriteLine($"KULLANICI EKLEME HATASI: {ex.Message}");
+            if(ex.InnerException != null) Console.WriteLine($"DETAY: {ex.InnerException.Message}");
+        }
+        finally
+        {
+            StateHasChanged(); // UI'ı her halükarda güncelle
+        }
+    }
+
+    // KURŞUN GEÇİRMEZ KULLANICI SİLME METODU 🗑️
+    private async Task DeleteUserAndPortfolio(Portfolio portfolio)
+    {
+        try
+        {
+            using var db = await DbFactory.CreateDbContextAsync();
+            var user = await db.Users.FindAsync(portfolio.UserId);
+            if (user != null) 
+            { 
+                db.Users.Remove(user); 
+                // Portfolyo silinme işlemi cascade delete (veritabanı ayarı) ile otomatik silinir,
+                // ama manuel olarak da silebiliriz.
+                
+                // Track edilen entity context ile silinmelidir
+                var trackedPortfolio = await db.Portfolios.FindAsync(portfolio.Id);
+                if(trackedPortfolio != null) db.Portfolios.Remove(trackedPortfolio);
+                
+                await db.SaveChangesAsync(); 
+            }
+            await LoadDashboardData();
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"SİLME HATASI: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+}

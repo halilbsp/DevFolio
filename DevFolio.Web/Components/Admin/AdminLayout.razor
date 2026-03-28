@@ -1,0 +1,95 @@
+@inherits LayoutComponentBase
+@namespace DevFolio.Web.Components.Admin
+
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevFolio | Admin Console</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#ffffff",
+              "outline-variant": "#484847",
+              "error": "#ff716c",
+              "secondary": "#a68cff",
+              "surface-bright": "#2c2c2c",
+              "surface-container-lowest": "#000000",
+              "on-surface-variant": "#adaaaa",
+              "surface-dim": "#0e0e0e",
+              "primary": "#81ecff",
+              "surface-container-highest": "#262626",
+              "surface-container-high": "#20201f",
+              "surface-container": "#1a1a1a",
+              "primary-container": "#00e3fd"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { background-color: #0e0e0e; color: #ffffff; font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen selection:bg-primary/30 selection:text-primary">
+    
+    <aside class="fixed left-0 top-0 h-full w-64 flex flex-col bg-[#131313] border-r border-white/5 shadow-2xl z-50">
+        <div class="p-8 flex items-center gap-2">
+            <div class="w-8 h-8 rounded bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">terminal</span>
+            </div>
+            <h1 class="font-headline text-xl font-black italic text-cyan-400">DevFolio Admin</h1>
+        </div>
+        
+        <nav class="flex-1 space-y-2 mt-4">
+            <p class="px-8 text-[10px] text-neutral-500 font-medium uppercase tracking-[0.2em] mb-4">YÖNETİM ALANI</p>
+            
+            <a href="/admin/dashboard" class="flex items-center gap-4 px-8 py-3.5 text-secondary font-bold bg-[#1a1a1a] border-r-2 border-secondary">
+                <span class="material-symbols-outlined text-[22px]">dashboard_customize</span>
+                <span class="font-['Space_Grotesk'] font-medium text-base">Gösterge Paneli</span>
+            </a>
+            <a href="/admin/projects" class="flex items-center gap-4 px-8 py-3.5 text-neutral-400 hover:text-white transition-colors opacity-80 hover:opacity-100">
+                <span class="material-symbols-outlined text-[22px]">deployed_code</span>
+                <span class="font-['Space_Grotesk'] font-medium text-base">Projeler</span>
+            </a>
+            <a href="/admin/skills" class="flex items-center gap-4 px-8 py-3.5 text-neutral-400 hover:text-white transition-colors opacity-80 hover:opacity-100">
+                <span class="material-symbols-outlined text-[22px]">psychology</span>
+                <span class="font-['Space_Grotesk'] font-medium text-base">Yetenekler</span>
+            </a>
+            <a href="/admin/portfolio-settings" class="flex items-center gap-4 px-8 py-3.5 text-neutral-400 hover:text-white transition-colors opacity-80 hover:opacity-100">
+                <span class="material-symbols-outlined text-[22px]">settings_accessibility</span>
+                <span class="font-['Space_Grotesk'] font-medium text-base">Portfolyo Ayarları</span>
+            </a>
+        </nav>
+        
+        <div class="p-8 border-t border-white/5">
+            <a href="/logout" class="flex items-center gap-4 text-error opacity-80 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-[22px]">logout</span>
+                <span class="font-headline font-bold text-base">Çıkış Yap</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="ml-64 flex-1 p-12 bg-surface-dim h-screen overflow-y-auto">
+        @Body
+    </main>
+    
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>

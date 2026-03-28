@@ -1,0 +1,94 @@
+@page "/admin/projects"
+@rendermode InteractiveServer
+@layout DevFolio.Web.Components.Admin.AdminLayout
+@using DevFolio.Infrastructure.Context
+@using DevFolio.Domain.Entities
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+
+<header class="mb-12">
+    <h2 class="font-headline text-4xl font-bold tracking-tight text-white">Tüm Projeler</h2>
+    <p class="text-on-surface-variant mt-2 font-medium text-sm">Sistemdeki tüm kullanıcıların yüklediği projeleri buradan izleyin ve denetleyin.</p>
+</header>
+
+<div class="bg-surface-container-low rounded-xl overflow-hidden border border-white/5 shadow-lg flex flex-col">
+    <div class="px-8 py-6 flex justify-between items-center bg-surface-container">
+        <h3 class="font-headline font-bold text-lg text-white">GLOBAL PROJE HAVUZU</h3>
+    </div>
+    
+    <div class="overflow-x-auto flex-1">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="text-[10px] tracking-[0.15em] text-on-surface-variant uppercase bg-surface-container/50">
+                    <th class="px-8 py-4 font-semibold">Proje Görseli & Adı</th>
+                    <th class="px-4 py-4 font-semibold">Sahibi (Geliştirici)</th>
+                    <th class="px-4 py-4 font-semibold">Teknolojiler</th>
+                    <th class="px-8 py-4 font-semibold text-right">Aksiyonlar</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm divide-y divide-white/5">
+                @if (allProjects == null)
+                {
+                    <tr><td colspan="4" class="px-8 py-10 text-center"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto"></div></td></tr>
+                }
+                else if (!allProjects.Any())
+                {
+                    <tr><td colspan="4" class="px-8 py-10 text-center text-on-surface-variant">Sistemde hiç proje bulunmuyor.</td></tr>
+                }
+                else
+                {
+                    @foreach (var project in allProjects)
+                    {
+                        <tr class="hover:bg-surface-container-highest/30 transition-colors">
+                            <td class="px-8 py-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-10 rounded bg-black overflow-hidden border border-white/10 flex items-center justify-center">
+                                        @if(!string.IsNullOrEmpty(project.ImageUrl)){ <img src="@project.ImageUrl" class="w-full h-full object-cover"/> }
+                                        else { <span class="material-symbols-outlined text-on-surface-variant text-xl opacity-50">deployed_code</span> }
+                                    </div>
+                                    <p class="font-bold text-white">@project.Title</p>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <a href="/@project.Portfolio?.FullName.ToLower().Replace(" ", "")" target="_blank" class="text-primary hover:underline font-bold">
+                                    @project.Portfolio?.FullName
+                                </a>
+                            </td>
+                            <td class="px-4 py-4 text-on-surface-variant text-xs">@project.Tags</td>
+                            <td class="px-8 py-4 text-right">
+                                <button @onclick="() => DeleteProject(project)" class="p-2 hover:bg-error/20 text-on-surface-variant hover:text-error rounded-lg transition-colors" title="Projeyi Sil">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<Project>? allProjects;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        // Portfolyo bilgisiyle beraber tüm projeleri çekiyoruz 🕵️‍♂️
+        allProjects = await Db.Projects
+            .Include(p => p.Portfolio)
+            .OrderByDescending(p => p.Id)
+            .ToListAsync();
+    }
+
+    private async Task DeleteProject(Project project)
+    {
+        Db.Projects.Remove(project);
+        await Db.SaveChangesAsync();
+        await LoadProjects(); // Listeyi yenile
+    }
+}

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="DevFolio.Application/DevFolio.Application.csproj" />
+  <Project Path="DevFolio.Domain/DevFolio.Domain.csproj" />
+  <Project Path="DevFolio.Infrastructure/DevFolio.Infrastructure.csproj" />
+  <Project Path="DevFolio.Web/DevFolio.Web.csproj" />
+</Solution>

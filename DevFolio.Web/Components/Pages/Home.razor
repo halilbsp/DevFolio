@@ -1,0 +1,256 @@
+﻿@page "/"
+
+<PageTitle>DevFolio | Profesyonel Varlığını İnşa Et</PageTitle>
+
+<style>
+    .glass-panel {
+        background: rgba(38, 38, 38, 0.2);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+    }
+    .hero-gradient {
+        background: radial-gradient(circle at 50% 50%, rgba(129, 236, 255, 0.08) 0%, rgba(14, 14, 14, 0) 70%);
+    }
+    .text-glow {
+        text-shadow: 0 0 20px rgba(129, 236, 255, 0.3);
+    }
+</style>
+
+<nav class="fixed top-0 w-full z-50 bg-surface-dim/20 backdrop-blur-xl shadow-[0px_24px_48px_rgba(0,229,255,0.04)]">
+    <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+        <div class="text-2xl font-bold tracking-tighter text-cyan-400 font-headline">
+            DevFolio
+        </div>
+        <div class="hidden md:flex items-center gap-8 font-headline text-sm tracking-tight">
+            <a class="text-cyan-400 border-b-2 border-cyan-400 pb-1" href="#ozellikler">Özellikler</a>
+            <a class="text-slate-400 hover:text-white transition-colors" href="#vitrin">Vitrin</a>
+            </div>
+        <a href="/user/dashboard" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-bold px-6 py-2 rounded-lg scale-95 active:scale-90 transition-transform font-headline text-sm">
+            Hemen Başla
+        </a>
+    </div>
+</nav>
+
+<main>
+    <section class="relative pt-32 pb-24 overflow-hidden hero-gradient">
+        <div class="max-w-7xl mx-auto px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="flex-1 space-y-8">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest font-headline">
+                        <span class="material-symbols-outlined text-[14px]">terminal</span>
+                        YENİ NESİL .NET EKOSİSTEMİ
+                    </div>
+                    <h1 class="text-5xl md:text-7xl font-headline font-bold tracking-tighter leading-[0.9] text-glow">
+                        Profesyonel Kimliğini <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Sıfırdan İnşa Et</span>
+                    </h1>
+                    <p class="text-on-surface-variant text-lg md:text-xl max-w-xl leading-relaxed">
+                        Kıdemli .NET geliştiricilerinin Blazor ve MSSQL kullanarak seçkin portfolyolar oluşturması, yönetmesi ve sergilemesi için tasarlanmış, tamamen ücretsiz ve üretime hazır platform.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="/user/dashboard" class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-8 py-4 rounded-lg font-headline font-bold text-lg hover:shadow-[0_0_30px_rgba(129,236,255,0.3)] transition-all">
+                            Portfolyonu Yayınla
+                        </a>
+                        <button class="px-8 py-4 rounded-lg font-headline font-bold text-lg border border-outline-variant/30 hover:bg-white/5 transition-all text-on-surface">
+                            Dokümantasyon
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 relative w-full aspect-square md:aspect-video lg:aspect-square">
+                    <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full"></div>
+                    <div class="relative w-full h-full glass-panel rounded-2xl border border-white/10 overflow-hidden p-1 shadow-2xl">
+                        <img class="w-full h-full object-cover rounded-xl opacity-60 mix-blend-screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDduH0tEOhwnOBfBJKCV33JnOECZ7CJDq-Ipsm931ymIzVwHU_oC4wp_Yt5wRUFHpTlz3vlFg8jHafejTRYulTKjkYngNRsbo6vntOgQoA_H9WYuPQtdbq9CXVEvYwBT4JnfiHN0PpyR7hZrcMlp_c0OQvwzign3q4CWRPINCz8VlYppHEjINtY9HeFWrp-Q76NOmVhyBJURHxM8qWu-Q_57Lt1FI-4Ciowo-ckIUOc00Yoi1jF1HiA6je6htUTjSE6Cp0P_k1508w" />
+                        <div class="absolute top-4 left-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md rounded p-4 font-mono text-xs text-primary/80 border border-white/5">
+                            <div class="flex gap-2 mb-2">
+                                <div class="w-2 h-2 rounded-full bg-error"></div>
+                                <div class="w-2 h-2 rounded-full bg-primary-container"></div>
+                                <div class="w-2 h-2 rounded-full bg-secondary"></div>
+                            </div>
+                            <div class="text-secondary">dotnet</div> <span>new portfolio --template clean-arch</span><br/>
+                            <div class="text-primary-dim">Success:</div> <span>Project generated at ~/path/to/identity</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ozellikler" class="py-24 bg-surface-container-low">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="mb-16">
+                <h2 class="text-3xl font-headline font-bold tracking-tight mb-4">Çekirdek Altyapı</h2>
+                <p class="text-on-surface-variant max-w-2xl">Maksimum performans için tasarlandı, modern mimarlar için mühendislikle üretildi.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-surface-container-high p-8 rounded-xl border border-white/5 hover:border-primary/20 transition-all group">
+                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">architecture</span>
+                    </div>
+                    <h3 class="text-xl font-headline font-bold mb-3">Temiz Mimari (Clean Architecture)</h3>
+                    <p class="text-on-surface-variant text-sm leading-relaxed">Çekirdeğe entegre edilmiş Domain-Driven Design (DDD). İş mantığının saf ve test edilebilir kalmasını sağlayan birbirinden bağımsız katmanlar.</p>
+                </div>
+                <div class="bg-surface-container-high p-8 rounded-xl border border-white/5 hover:border-primary/20 transition-all group">
+                    <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
+                    </div>
+                    <h3 class="text-xl font-headline font-bold mb-3">.NET 10 Hazır</h3>
+                    <p class="text-on-surface-variant text-sm leading-relaxed">Kurumsal düzeyde hız için en son performans iyileştirmelerinden, yeni C# özelliklerinden ve optimize edilmiş çalışma zamanından yararlanın.</p>
+                </div>
+                <div class="bg-surface-container-high p-8 rounded-xl border border-white/5 hover:border-primary/20 transition-all group">
+                    <div class="w-12 h-12 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                    </div>
+                    <h3 class="text-xl font-headline font-bold mb-3">Blazor Performansı</h3>
+                    <p class="text-on-surface-variant text-sm leading-relaxed">JavaScript yorgunluğu olmadan interaktif arayüzler. İhtiyaçlarınıza göre kusursuz WebAssembly veya Sunucu Tarafı (SSR) oluşturma.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex flex-col items-center text-center mb-16">
+                <h2 class="text-4xl font-headline font-bold tracking-tight mb-6">Kontrol Merkezi</h2>
+                <p class="text-on-surface-variant max-w-2xl text-lg">Geliştiriciler için özel tasarlanmış, şık ve yüksek performanslı bir yönetim paneli (dashboard) üzerinden tüm profesyonel kimliğinizi yönetin.</p>
+            </div>
+            <div class="relative">
+                <div class="relative z-10 glass-panel rounded-2xl border border-white/10 shadow-2xl overflow-hidden aspect-video max-w-5xl mx-auto">
+                    <div class="flex h-full">
+                        <div class="w-64 bg-surface-container-lowest/40 border-r border-white/5 p-6 hidden md:block">
+                            <div class="space-y-6">
+                                <div class="h-4 w-32 bg-primary/20 rounded"></div>
+                                <div class="space-y-3">
+                                    <div class="h-8 w-full bg-white/5 rounded"></div>
+                                    <div class="h-8 w-full bg-white/5 rounded"></div>
+                                    <div class="h-8 w-full bg-primary/10 rounded"></div>
+                                    <div class="h-8 w-full bg-white/5 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 p-8">
+                            <div class="grid grid-cols-3 gap-6 mb-8">
+                                <div class="h-24 bg-white/5 rounded-xl border border-white/5 p-4">
+                                    <div class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Aktif Yayına Alımlar</div>
+                                    <div class="text-2xl font-headline font-bold text-primary">12</div>
+                                </div>
+                                <div class="h-24 bg-white/5 rounded-xl border border-white/5 p-4">
+                                    <div class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Çalışma Süresi (Uptime)</div>
+                                    <div class="text-2xl font-headline font-bold text-secondary">99.9%</div>
+                                </div>
+                                <div class="h-24 bg-white/5 rounded-xl border border-white/5 p-4">
+                                    <div class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Derleme Durumu</div>
+                                    <div class="text-2xl font-headline font-bold text-primary-container">Sağlıklı</div>
+                                </div>
+                            </div>
+                            <div class="h-64 bg-surface-container-lowest/60 rounded-xl border border-white/5 relative overflow-hidden">
+                                <img class="w-full h-full object-cover opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-rUPeUXDj9USnDaMysZ3RAITM2lQ3F6zFd9KbGnh5XNixQz26pPzyhcKegInhuRjroNgRqnikiDPcBocg2mOZf3nsbtK_IjlpMHky_LKp150uFdyj3qXeOuEZx0L1PB4Dsh2qHNj9q4HXh9FaKGAGFKmo4ay2q-LO_CaNR7ULJcB1CLTVlRRWnnrq7qGTDD1p0ap44s8yOVyY7ueE6dKk5QV4tqgm1yBiZfafpzjCxg4cxpKSuCSdDKfB3WyZCodn7ekICJtGSvk" />
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="text-primary font-headline font-bold tracking-widest flex items-center gap-3">
+                                        <span class="material-symbols-outlined">analytics</span>
+                                        GERÇEK ZAMANLI TELEMETRİ AKTİF
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute top-1/2 left-0 w-96 h-96 bg-primary/10 blur-[120px] rounded-full -translate-y-1/2 -translate-x-1/2"></div>
+                <div class="absolute top-1/2 right-0 w-96 h-96 bg-secondary/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-surface-container-low border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-headline font-bold tracking-tight mb-8">Mimarlar Tarafından, <br/>Mimarlar İçin Geliştirildi.</h2>
+                    <p class="text-on-surface-variant text-lg mb-8 leading-relaxed">
+                        DevFolio sadece bir web sitesi oluşturucu değildir. Kıdemli bir mühendisin teknik karmaşıklığını ve hassasiyetini yansıtmak üzere tasarlanmış tamamen ücretsiz özel bir framework mimarisidir.
+                    </p>
+                    <ul class="space-y-6">
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 text-primary">
+                                <span class="material-symbols-outlined">check_circle</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-on-surface">Native MSSQL Entegrasyonu</h4>
+                                <p class="text-sm text-on-surface-variant">Optimize edilmiş Entity Framework Core sağlayıcısı ile son derece sağlam veri kalıcılığı (persistence) katmanı.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 text-primary">
+                                <span class="material-symbols-outlined">check_circle</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-on-surface">Üretime Hazır (Production Ready) CI/CD</h4>
+                                <p class="text-sm text-on-surface-variant">Otomatik test ve deployment (yayına alma) için önceden yapılandırılmış GitHub Actions iş akışları.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 text-primary">
+                                <span class="material-symbols-outlined">check_circle</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-on-surface">Özel Middleware Desteği</h4>
+                                <p class="text-sm text-on-surface-variant">Zaten bildiğiniz standart .NET middleware kalıplarını kullanarak işlevselliği uçtan uca genişletin.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div class="h-48 rounded-xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 border border-white/5">
+                            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9zs5kVdj8NyC_GKvY-AR0cAML8UWS_XMrS1LPkOv2d9fYBpdiO8HNvMce8iJ_fc6UyLMAbHNqXQN6mmEjJQtCYIHaTRgZ93BBuSDIWSZD6ICHyc0KNoePx-fUS4ta0PpENvpKJV9w7w1r33j-GoFh9uUPwNV5FDHhHZ4wqfWli6vitnybTQAXOOjV4enalrDAVwNjMJG5EVqqLEtH4gxIJ5HlyvP8J0BxftyjPV_l5sSbvVaVCDW-_ezdpkbIosvTjEAv6-hoXa4" />
+                        </div>
+                        <div class="bg-surface-container-highest p-6 rounded-xl border border-white/5">
+                            <div class="text-3xl font-headline font-bold text-primary mb-1">10ms</div>
+                            <div class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Ort. Yanıt Süresi</div>
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-8">
+                        <div class="bg-surface-container-highest p-6 rounded-xl border border-white/5">
+                            <div class="text-3xl font-headline font-bold text-secondary mb-1">100%</div>
+                            <div class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">C# Ekosistemi</div>
+                        </div>
+                        <div class="h-48 rounded-xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-500 border border-white/5">
+                            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdgm-DeCa0C-2FK7TO6hQmHAxr-Sd2JzR3KXBudM2ZAu7WCPUECmoIBgoGbc3ZTnwYfxr5EjaS2g8CjtCfAMEfjNnGE39rAq0e6XpkU4q_GC90LrOfwaOVr4Gvzkg3C8QjCj60US2eqrDQMutrQIhF1bG4oHxMxDtdmOeX6hkUCOnniT1GSUV9_HQaAhlWwAAYUZ9TXqgZ_HINAiAztKHxxNcCn3KH4pCE3nrPr727_DHj-fTrbZkwExXEoyHY9EJib39N6RnNTh8" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-8 text-center relative z-10">
+            <h2 class="text-4xl md:text-5xl font-headline font-bold mb-8 tracking-tighter">Kendi <span class="text-primary">Başyapıtını</span> yayınlamaya hazır mısın?</h2>
+            <p class="text-on-surface-variant text-lg mb-12">Profesyonel dijital varlıkları için DevFolio altyapısına güvenen yüzlerce kıdemli mimara (architect) katıl.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <a href="/user/dashboard" class="bg-primary text-on-primary-fixed font-bold font-headline px-10 py-5 rounded-lg text-xl hover:shadow-[0_0_40px_rgba(129,236,255,0.4)] transition-all">
+                    Hemen Başla
+                </a>
+                <a href="/halil" class="bg-transparent border border-outline-variant text-on-surface font-bold font-headline px-10 py-5 rounded-lg text-xl hover:bg-white/5 transition-all">
+                    Demo Portfolyoyu İncele
+                </a>
+            </div>
+        </div>
+        <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-surface-dim to-surface-dim"></div>
+    </section>
+</main>
+
+<footer class="w-full py-12 px-8 bg-surface-dim dark:bg-[#0e0e0e] border-t border-white/5">
+    <div class="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto gap-6">
+        <div class="flex flex-col items-center md:items-start gap-4">
+            <div class="text-lg font-bold text-cyan-400 font-headline">DevFolio Platform</div>
+            <div class="font-['Inter'] text-xs text-slate-500">© @DateTime.Now.Year DevFolio. .NET 10 ile geliştirildi. Tamamen Açık ve Ücretsiz.</div>
+        </div>
+        <div class="flex gap-8">
+            <a class="font-['Inter'] text-xs text-slate-500 hover:text-cyan-400 transition-colors opacity-80 hover:opacity-100" href="#">Twitter</a>
+            <a class="font-['Inter'] text-xs text-slate-500 hover:text-cyan-400 transition-colors opacity-80 hover:opacity-100" href="#">GitHub</a>
+            <a class="font-['Inter'] text-xs text-slate-500 hover:text-cyan-400 transition-colors opacity-80 hover:opacity-100" href="#">LinkedIn</a>
+            <a class="font-['Inter'] text-xs text-slate-500 hover:text-cyan-400 transition-colors opacity-80 hover:opacity-100" href="#">Discord</a>
+        </div>
+    </div>
+</footer>

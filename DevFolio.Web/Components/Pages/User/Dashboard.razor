@@ -1,0 +1,303 @@
+@page "/user/dashboard"
+@rendermode InteractiveServer
+@layout DevFolio.Web.Components.Layout.UserLayout
+@using DevFolio.Domain.Entities
+@using DevFolio.Application.Interfaces
+@using Microsoft.AspNetCore.Hosting
+@inject IPortfolioRepository PortfolioRepo
+@inject IWebHostEnvironment Env
+
+@if (CurrentPortfolio == null)
+{
+    <div class="flex h-full items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
+    </div>
+}
+else
+{
+    <header class="flex justify-between items-end mb-12">
+        <div>
+            <h1 class="font-headline text-4xl font-bold tracking-tight text-white">Ana Editör</h1>
+            <p class="text-on-surface-variant font-body mt-2">Dijital kimliğini, projelerini ve yeteneklerini yönet.</p>
+        </div>
+        <div class="flex gap-4">
+            <a href="/@CurrentPortfolio.FullName.ToLower().Replace(" ", "")" target="_blank" class="px-6 py-2.5 rounded-lg border border-outline-variant/30 text-secondary hover:bg-secondary/10 transition-all font-medium flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">visibility</span>
+                Portfolyoyu Görüntüle
+            </a>
+            <button @onclick="SavePortfolio" class="px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+                @if(isSaving){ <span class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-on-primary inline-block mr-2"></span><span>Kaydediliyor...</span> }
+                else { <span>Değişiklikleri Kaydet</span> }
+            </button>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-12 gap-8">
+        <section class="col-span-8 flex flex-col gap-8">
+            
+            <div id="kimlik" class="bg-surface-container-low p-8 rounded-xl border border-white/5 shadow-lg scroll-mt-10">
+                <h3 class="font-headline text-xl font-semibold mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-primary">person</span>Kimlik Konfigürasyonu</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="flex flex-col gap-2"><label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Ad Soyad</label><input @bind="CurrentPortfolio.FullName" placeholder="Örn: Alex Chen" class="bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 rounded-sm p-3 text-on-surface focus:ring-primary/50 focus:ring-2 transition-all outline-none" type="text"/></div>
+                    <div class="flex flex-col gap-2"><label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Profesyonel Ünvan</label><input @bind="CurrentPortfolio.JobTitle" placeholder="Örn: Senior Full-Stack Architect" class="bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 rounded-sm p-3 text-on-surface focus:ring-primary/50 focus:ring-2 transition-all outline-none" type="text"/></div>
+                    <div class="col-span-2 flex flex-col gap-2"><label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Sistem Biyografisi</label><textarea @bind="CurrentPortfolio.Bio" placeholder="Kısaca deneyimlerinden ve hedeflerinden bahset..." class="bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 rounded-sm p-4 text-on-surface-variant text-sm focus:ring-primary/50 focus:ring-2 outline-none resize-none" rows="4"></textarea></div>
+                </div>
+            </div>
+
+            <div id="projeler" class="bg-surface-container-low p-8 rounded-xl border border-white/5 shadow-lg scroll-mt-10">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-headline text-xl font-semibold flex items-center gap-2"><span class="material-symbols-outlined text-secondary">database</span>Proje Havuzu</h3>
+                    <button @onclick="OpenAddProjectModal" class="text-sm font-bold text-primary flex items-center gap-1 hover:underline"><span class="material-symbols-outlined text-base">add_circle</span>Yeni Proje Ekle</button>
+                </div>
+                <div class="space-y-4">
+                    @if (CurrentPortfolio.Projects != null && CurrentPortfolio.Projects.Any()) {
+                        @foreach (var project in CurrentPortfolio.Projects) {
+                            <div class="group flex items-center justify-between p-4 bg-surface-container rounded-lg hover:bg-surface-container-high transition-all border border-transparent hover:border-white/5 relative">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-32 h-20 rounded-lg bg-surface-container-lowest overflow-hidden flex items-center justify-center border border-white/5 shadow-inner">
+                                        @if(!string.IsNullOrEmpty(project.ImageUrl)){ <img src="@project.ImageUrl" class="w-full h-full object-cover" /> } 
+                                        else { <span class="material-symbols-outlined text-on-surface-variant text-4xl opacity-50">terminal</span> }
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-lg">@project.Title</h4>
+                                        <p class="text-sm text-on-surface-variant mt-1">@project.Tags</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button @onclick="() => OpenEditProjectModal(project)" class="p-2 hover:bg-primary/20 hover:text-primary rounded-lg transition-colors"><span class="material-symbols-outlined text-lg">edit</span></button>
+                                    <button @onclick="() => DeleteProject(project)" class="p-2 hover:bg-error/20 hover:text-error rounded-lg transition-colors"><span class="material-symbols-outlined text-lg">delete</span></button>
+                                </div>
+                            </div>
+                        }
+                    } else { <div class="text-center py-12 border border-dashed border-white/10 rounded-lg text-on-surface-variant"><p class="text-lg">Henüz bir proje eklemedin.</p></div> }
+                </div>
+            </div>
+
+            <div id="yetenekler" class="bg-surface-container-low p-8 rounded-xl border border-white/5 shadow-lg scroll-mt-10">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-headline text-xl font-semibold flex items-center gap-2"><span class="material-symbols-outlined text-tertiary">psychology</span>Teknoloji & Yetenekler</h3>
+                    <button @onclick="OpenAddSkillModal" class="text-sm font-bold text-primary flex items-center gap-1 hover:underline"><span class="material-symbols-outlined text-base">add_circle</span>Yetenek Ekle</button>
+                </div>
+                <div class="flex flex-wrap gap-4">
+                    @if (CurrentPortfolio.Skills != null && CurrentPortfolio.Skills.Any()) {
+                        @foreach (var skill in CurrentPortfolio.Skills) {
+                            <div class="group flex items-center gap-3 px-4 py-2 bg-surface-container rounded-lg hover:bg-surface-container-high transition-all border border-transparent hover:border-white/5 relative">
+                                <span class="@skill.ColorClass font-headline font-bold">@skill.Name</span>
+                                <div class="absolute -top-3 -right-3 hidden group-hover:flex bg-surface-bright rounded shadow-lg border border-white/10 overflow-hidden">
+                                    <button @onclick="() => OpenEditSkillModal(skill)" class="p-1 hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[14px]">edit</span></button>
+                                    <button @onclick="() => DeleteSkill(skill)" class="p-1 hover:bg-error/20 text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
+                                </div>
+                            </div>
+                        }
+                    } else { <div class="w-full text-center py-6 border border-dashed border-white/10 rounded-lg text-on-surface-variant"><p>Sisteme henüz teknoloji girmedin.</p></div> }
+                </div>
+            </div>
+        </section>
+
+        <section class="col-span-4 flex flex-col gap-8">
+            <div id="gorsel" class="bg-surface-container-low p-8 rounded-xl border border-white/5 shadow-lg scroll-mt-10">
+                <h3 class="font-headline text-lg font-semibold mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-tertiary">image</span>Görsel Medya</h3>
+                <div class="flex flex-col items-center gap-6">
+                    <div class="relative group cursor-pointer">
+                        <img class="w-32 h-32 rounded-2xl object-cover ring-2 ring-outline-variant/30 group-hover:ring-primary transition-all" src="@CurrentPortfolio.ProfileImageUrl" onerror="this.src='https://lh3.googleusercontent.com/aida-public/AB6AXuBaXnf6IaW7mka5-KeXY8SFyjqbQ8G4TTFy_9MpsuaPIJjVtDZjWkmuACYEhiaOR1PwbF2R8qPAau1ZJ8KuQhgjEZ9ogxsakOnQUMegh-B3YnQlP8JnmAXy8RpUjVB2IPzJ-MGILaYW0OH31Y1RlI2JkW46Lsy8bACQrNo699neav7eRSHKkYJ-WN7aTHFX6oSu8QuN0dobM2FeglR-I8dLYoYlUXGKi6I4q08v0NG1rKJeXogy-LgxAu1oNi7LrsCC6et4n5PrsC8'" />
+                        <div class="absolute inset-0 bg-black/60 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            @if(isUploadingImage){ <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div> } else { <span class="material-symbols-outlined text-white text-3xl">upload_file</span> }
+                        </div>
+                        <InputFile OnChange="HandleImageUpload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" />
+                    </div>
+                    <div class="w-full flex flex-col gap-2"><label class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Görsel URL</label><input @bind="CurrentPortfolio.ProfileImageUrl" placeholder="https://..." class="w-full text-xs font-mono bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 rounded-sm p-3 text-secondary outline-none" type="text" /></div>
+                </div>
+            </div>
+            
+            <div class="bg-surface-container-low p-8 rounded-xl border border-white/5 shadow-lg">
+                <h3 class="font-headline text-lg font-semibold mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-secondary">palette</span>Sistem Teması</h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" name="theme" value="Minimal" checked="@(CurrentPortfolio.ThemePreference == "Minimal")" @onchange="@(() => CurrentPortfolio.ThemePreference = "Minimal")" class="peer sr-only" />
+                        <div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-lowest ring-1 ring-outline-variant/20 peer-checked:ring-primary peer-checked:bg-primary/5 transition-all"><div class="w-3 h-3 rounded-full bg-neutral-300 ring-2 ring-neutral-700"></div><span class="text-sm font-medium text-on-surface-variant group-hover:text-white transition-colors">Minimal</span><span class="material-symbols-outlined ml-auto text-primary opacity-0 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">check_circle</span></div>
+                    </label>
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" name="theme" value="Dark" checked="@(CurrentPortfolio.ThemePreference == "Dark")" @onchange="@(() => CurrentPortfolio.ThemePreference = "Dark")" class="peer sr-only" />
+                        <div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-lowest ring-1 ring-outline-variant/20 peer-checked:ring-secondary peer-checked:bg-secondary/5 transition-all"><div class="w-3 h-3 rounded-full bg-neutral-900 ring-2 ring-neutral-500"></div><span class="text-sm font-medium text-on-surface-variant group-hover:text-white transition-colors">Karanlık Terminal</span><span class="material-symbols-outlined ml-auto text-secondary opacity-0 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">check_circle</span></div>
+                    </label>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    @if (isProjectModalOpen) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="bg-[#131313] border border-white/10 rounded-2xl w-full max-w-5xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div class="p-6 border-b border-white/5 flex justify-between items-center bg-surface-container-low"><h2 class="font-headline text-2xl font-bold text-white">@(isNewProject ? "Yeni Proje Ekle" : "Projeyi Düzenle")</h2><button @onclick="CloseProjectModal" class="text-on-surface-variant hover:text-white"><span class="material-symbols-outlined">close</span></button></div>
+                
+                <div class="flex overflow-y-auto">
+                    <div class="w-2/5 p-12 border-r border-white/5 bg-surface-container-lowest flex flex-col items-center gap-8">
+                        <div class="relative group cursor-pointer w-full aspect-[3/2] rounded-xl bg-surface-container overflow-hidden border border-white/5 flex items-center justify-center">
+                            @if(!string.IsNullOrEmpty(editingProject.ImageUrl)){ <img src="@editingProject.ImageUrl" class="w-full h-full object-cover" /> } 
+                            else { <span class="material-symbols-outlined text-on-surface-variant text-6xl opacity-30">deployed_code</span> }
+                            <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                                @if(isUploadingProjectImage){ <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div> }
+                                else { <span class="material-symbols-outlined text-white text-4xl">upload_file</span><p class="text-sm text-white font-medium">Proje Görseli Yükle</p> }
+                            </div>
+                            <InputFile OnChange="HandleProjectImageUpload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" />
+                        </div>
+                        <div class="w-full flex flex-col gap-2"><label class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Görsel URL</label><input @bind="editingProject.ImageUrl" placeholder="https://..." class="w-full text-xs font-mono bg-surface-container border-none ring-1 ring-white/10 rounded-sm p-3 text-secondary outline-none" type="text" /></div>
+                    </div>
+
+                    <div class="w-3/5 p-12 space-y-6">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Proje Adı</label>
+                            <input @bind="editingProject.Title" placeholder="Örn: E-Ticaret API" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary transition-all placeholder:text-outline-variant" />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Kısa Açıklama</label>
+                            <textarea @bind="editingProject.Description" placeholder="Projeyi kısaca anlatın..." rows="3" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary transition-all resize-none placeholder:text-outline-variant"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">GitHub Linki</label>
+                                <input @bind="editingProject.GithubUrl" placeholder="https://github.com/..." class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary transition-all placeholder:text-outline-variant" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Canlı Site Linki</label>
+                                <input @bind="editingProject.LiveUrl" placeholder="https://..." class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary transition-all placeholder:text-outline-variant" />
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Teknolojiler</label>
+                            <input @bind="editingProject.Tags" placeholder="Örn: C#, Blazor, Tailwind (Virgülle ayırın)" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary transition-all placeholder:text-outline-variant" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 border-t border-white/5 flex justify-end gap-4 bg-surface-container-low"><button @onclick="CloseProjectModal" class="px-6 py-2.5 rounded text-on-surface-variant hover:text-white font-bold transition-all">İptal</button><button @onclick="SaveProjectToDb" class="px-6 py-2.5 rounded bg-primary text-on-primary-fixed font-bold hover:bg-primary-container transition-all shadow-lg shadow-primary/20">Kaydet</button></div>
+            </div>
+        </div>
+    }
+
+    @if (isSkillModalOpen) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="bg-[#131313] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-white/5 flex justify-between items-center bg-surface-container-low"><h2 class="font-headline text-2xl font-bold text-white">@(isNewSkill ? "Yeni Yetenek Ekle" : "Yeteneği Düzenle")</h2><button @onclick="CloseSkillModal" class="text-on-surface-variant hover:text-white"><span class="material-symbols-outlined">close</span></button></div>
+                <div class="p-8 space-y-6">
+                    <div class="flex flex-col gap-2"><label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Yetenek Adı</label><input @bind="editingSkill.Name" placeholder="Örn: Docker, Kubernetes" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary transition-all placeholder:text-outline-variant" /></div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs uppercase tracking-widest text-on-surface-variant font-bold">Renk Teması</label>
+                        <select @bind="editingSkill.ColorClass" class="bg-[#0e0e0e] border-none ring-1 ring-white/10 rounded p-3 text-white focus:ring-primary transition-all">
+                            <option value="text-primary">Neon Mavi</option><option value="text-secondary">Mor</option><option value="text-white">Beyaz</option><option value="text-tertiary">Açık Mavi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="p-6 border-t border-white/5 flex justify-end gap-4 bg-surface-container-low"><button @onclick="CloseSkillModal" class="px-6 py-2.5 rounded text-on-surface-variant hover:text-white font-bold transition-all">İptal</button><button @onclick="SaveSkillToDb" class="px-6 py-2.5 rounded bg-secondary text-white font-bold hover:bg-[#a68cff] transition-all">Kaydet</button></div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private Portfolio? CurrentPortfolio;
+    private bool isSaving = false;
+    private bool isUploadingImage = false;
+    private bool isUploadingProjectImage = false; // Proje görseli yükleme durumu ✨
+
+    private bool isProjectModalOpen = false; private bool isNewProject = true; private Project editingProject = new Project();
+    private bool isSkillModalOpen = false; private bool isNewSkill = true; private Skill editingSkill = new Skill();
+
+    protected override async Task OnInitializedAsync() { await LoadData(); }
+
+    private async Task LoadData() { CurrentPortfolio = await PortfolioRepo.GetPortfolioByUsernameAsync("Halil"); }
+
+    private async Task SavePortfolio() {
+        if (CurrentPortfolio != null) {
+            isSaving = true; StateHasChanged();
+            await PortfolioRepo.UpdatePortfolioAsync(CurrentPortfolio);
+            await LoadData();
+            isSaving = false; StateHasChanged();
+        }
+    }
+
+    // --- PROJE CRUD İŞLEMLERİ --- 🛠️ ✨ PROJE GÖRSELİ DAHİL EDİLDİ
+    private void OpenAddProjectModal() { editingProject = new Project { PortfolioId = CurrentPortfolio!.Id }; isNewProject = true; isProjectModalOpen = true; }
+    private void OpenEditProjectModal(Project project) { 
+        editingProject = new Project { 
+            Id = project.Id, PortfolioId = project.PortfolioId, Title = project.Title, Description = project.Description, 
+            GithubUrl = project.GithubUrl, LiveUrl = project.LiveUrl, Tags = project.Tags, ImageUrl = project.ImageUrl // ✨ ImageUrl eklendi
+        }; 
+        isNewProject = false; isProjectModalOpen = true; 
+    }
+    
+    private async Task SaveProjectToDb() {
+        if (isNewProject) await PortfolioRepo.AddProjectAsync(editingProject);
+        else await PortfolioRepo.UpdateProjectAsync(editingProject);
+        await LoadData(); isProjectModalOpen = false; StateHasChanged();
+    }
+    
+    private async Task DeleteProject(Project project) {
+        await PortfolioRepo.DeleteProjectAsync(project); await LoadData(); StateHasChanged();
+    }
+    private void CloseProjectModal() { isProjectModalOpen = false; }
+
+    // --- YETENEK CRUD İŞLEMLERİ --- 🧠
+    private void OpenAddSkillModal() { editingSkill = new Skill { PortfolioId = CurrentPortfolio!.Id, ColorClass = "text-primary" }; isNewSkill = true; isSkillModalOpen = true; }
+    private void OpenEditSkillModal(Skill skill) { editingSkill = new Skill { Id = skill.Id, PortfolioId = skill.PortfolioId, Name = skill.Name, ColorClass = skill.ColorClass }; isNewSkill = false; isSkillModalOpen = true; }
+    
+    private async Task SaveSkillToDb() {
+        if (isNewSkill) await PortfolioRepo.AddSkillAsync(editingSkill);
+        else await PortfolioRepo.UpdateSkillAsync(editingSkill);
+        await LoadData(); isSkillModalOpen = false; StateHasChanged();
+    }
+    
+    private async Task DeleteSkill(Skill skill) {
+        await PortfolioRepo.DeleteSkillAsync(skill); await LoadData(); StateHasChanged();
+    }
+    private void CloseSkillModal() { isSkillModalOpen = false; }
+
+    // --- PROFİL RESMİ YÜKLEME --- 📸
+    private async Task HandleImageUpload(InputFileChangeEventArgs e) {
+        isUploadingImage = true; StateHasChanged();
+        var ext = Path.GetExtension(e.File.Name);
+        var newFileName = $"{Guid.NewGuid()}{ext}";
+        var uploadPath = Path.Combine(Env.WebRootPath ?? "wwwroot", "uploads");
+        if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+        using var stream = e.File.OpenReadStream(5 * 1024 * 1024);
+        using var fileStream = new FileStream(Path.Combine(uploadPath, newFileName), FileMode.Create);
+        await stream.CopyToAsync(fileStream);
+        CurrentPortfolio!.ProfileImageUrl = $"/uploads/{newFileName}";
+        await PortfolioRepo.UpdatePortfolioAsync(CurrentPortfolio);
+        await LoadData(); isUploadingImage = false; StateHasChanged();
+    }
+
+    // --- PROJE GÖRSELİ YÜKLEME METODU ✨ --- 📸
+    private async Task HandleProjectImageUpload(InputFileChangeEventArgs e) {
+        isUploadingProjectImage = true; StateHasChanged(); // Yükleme loaderını başlat
+        
+        try {
+            var file = e.File;
+            if (file != null) {
+                // Dosya adı çakışmasını önlemek için Guid üret🛡️
+                var ext = Path.GetExtension(file.Name);
+                var newFileName = $"{Guid.NewGuid()}{ext}";
+                
+                // Klasör yolunu ayarla (wwwroot/uploads)📁
+                var uploadPath = Path.Combine(Env.WebRootPath ?? "wwwroot", "uploads");
+                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+                
+                // Dosyayı sunucuya kaydet
+                using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024); // Maks 5MB🛡️
+                using var fileStream = new FileStream(Path.Combine(uploadPath, newFileName), FileMode.Create);
+                await stream.CopyToAsync(fileStream);
+                
+                // Kaydedilen resmin linkini editingProject'e ata🔗
+                editingProject.ImageUrl = $"/uploads/{newFileName}";
+            }
+        }
+        catch (Exception ex) {
+            Console.WriteLine($"Proje resim hatası: {ex.Message}");
+            // İleride buraya hata toast mesajı eklenebilir🛡️
+        }
+        finally {
+            isUploadingProjectImage = false; // Loaderı kapat
+            StateHasChanged(); // UI'ı güncelle
+        }
+    }
+}

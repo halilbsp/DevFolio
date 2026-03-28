@@ -1,0 +1,89 @@
+@inherits LayoutComponentBase
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevFolio Workspace 🚀</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-surface": "#ffffff",
+                "primary": "#81ecff",
+                "primary-container": "#00e3fd",
+                "surface-dim": "#0e0e0e",
+                "surface-container-lowest": "#000000",
+                "surface-container-highest": "#262626",
+                "outline-variant": "#484847"
+              },
+              fontFamily: {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              }
+            }
+          }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-sidebar { background: rgba(14, 14, 14, 0.95); border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="bg-surface-dim text-on-surface font-body flex h-screen overflow-hidden selection:bg-primary/30 selection:text-primary">
+    
+    <aside class="w-72 glass-sidebar flex flex-col h-full z-20">
+        <div class="p-8 flex items-center gap-3 border-b border-white/5">
+            <span class="material-symbols-outlined text-primary text-3xl">terminal</span>
+            <span class="text-primary font-black italic font-headline text-2xl tracking-tighter">DevFolio</span>
+        </div>
+        
+        <nav class="flex-1 px-4 py-8 space-y-2 overflow-y-auto">
+            <p class="px-4 text-xs font-label text-outline-variant uppercase tracking-widest mb-4">Yönetim Alanı</p>
+            
+            <a href="/admin/dashboard" class="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary/10 text-primary font-medium transition-all">
+                <span class="material-symbols-outlined">dashboard</span>
+                Gösterge Paneli
+            </a>
+            <a href="/admin/projects" class="flex items-center gap-4 px-4 py-3 rounded-xl text-neutral-400 hover:bg-surface-container-highest hover:text-white transition-all">
+                <span class="material-symbols-outlined">code_blocks</span>
+                Projeler
+            </a>
+            <a href="/admin/skills" class="flex items-center gap-4 px-4 py-3 rounded-xl text-neutral-400 hover:bg-surface-container-highest hover:text-white transition-all">
+                <span class="material-symbols-outlined">psychology</span>
+                Yetenekler
+            </a>
+            <a href="/admin/settings" class="flex items-center gap-4 px-4 py-3 rounded-xl text-neutral-400 hover:bg-surface-container-highest hover:text-white transition-all">
+                <span class="material-symbols-outlined">settings</span>
+                Portfolyo Ayarları
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-white/5">
+            <button class="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-red-400 hover:bg-red-400/10 transition-all">
+                <span class="material-symbols-outlined">logout</span>
+                Çıkış Yap
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full overflow-y-auto bg-[#0a0a0a] relative">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div class="p-10 relative z-10">
+            @Body
+        </div>
+    </main>
+
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>

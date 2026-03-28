@@ -1,0 +1,152 @@
+@page "/register"
+@rendermode InteractiveServer
+
+@using DevFolio.Domain.Entities
+@using DevFolio.Infrastructure.Context
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager Navigation
+
+<div class="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    
+    <!-- Arka plan terminal efektleri (Terminal Horizon temasına uygun) -->
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[120px]"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMSIvPjxwYXRoIGQ9Ik0wIDBMOCA4Wk04IDBMMCA4WiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wMiIvPjwvc3ZnPg==')]"></div>
+    </div>
+
+    <div class="w-full max-w-md bg-[#131313]/90 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl z-10 flex flex-col items-center">
+        
+        <div class="w-16 h-16 bg-black border border-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+            <span class="material-symbols-outlined text-4xl text-primary">terminal</span>
+        </div>
+
+        <h1 class="text-3xl font-bold mb-2 tracking-tight">Kayıt Ol</h1>
+        <p class="text-white/50 text-sm mb-8 text-center">Geliştirici portfolyonuzu hemen oluşturmaya başlayın.</p>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="w-full bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 mb-6">
+                <span class="material-symbols-outlined text-sm">error</span>
+                <span>@errorMessage</span>
+            </div>
+        }
+
+        <div class="w-full space-y-5">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] uppercase tracking-widest text-white/50 font-bold ml-1">Ad Soyad</label>
+                <input @bind="newUserName" placeholder="Örn: Ahmet Yılmaz" class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-3.5 text-white placeholder-white/20 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all shadow-inner" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] uppercase tracking-widest text-white/50 font-bold ml-1">E-Posta Adresi</label>
+                <input @bind="newUserEmail" type="email" placeholder="ornek@devfolio.com" class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-3.5 text-white placeholder-white/20 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all shadow-inner" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] uppercase tracking-widest text-white/50 font-bold ml-1">Şifre</label>
+                <input @bind="newUserPassword" type="password" placeholder="••••••••" class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-3.5 text-white placeholder-white/20 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all shadow-inner" />
+            </div>
+        </div>
+
+        <button disabled="@isSubmitting" @onclick="HandleRegister" class="w-full mt-8 bg-white text-black font-bold py-3.5 rounded-xl hover:bg-gray-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            @if(isSubmitting)
+            {
+                <span class="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin"></span>
+                <span>Kaydediliyor...</span>
+            }
+            else
+            {
+                <span>Hesabımı Oluştur</span>
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            }
+        </button>
+
+        <div class="mt-8 text-center text-xs text-white/40">
+            Zaten bir hesabın var mı? <a href="/login" class="text-white hover:text-primary transition-colors hover:underline">Giriş Yap</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string newUserName = "";
+    private string newUserEmail = "";
+    private string newUserPassword = "";
+    private string errorMessage = "";
+    private bool isSubmitting = false;
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            errorMessage = "";
+            
+            if (string.IsNullOrWhiteSpace(newUserName) || string.IsNullOrWhiteSpace(newUserEmail) || string.IsNullOrWhiteSpace(newUserPassword))
+            {
+                errorMessage = "Lütfen tüm alanları doldurun.";
+                return;
+            }
+
+            if (newUserPassword.Length < 6)
+            {
+                errorMessage = "Şifreniz en az 6 karakter uzunluğunda olmalıdır.";
+                return;
+            }
+
+            isSubmitting = true;
+            StateHasChanged();
+
+            using var db = await DbFactory.CreateDbContextAsync();
+
+            // Aynı e-posta adresiyle kayıt var mı kontrolü
+            var emailExists = await db.Users.AnyAsync(u => u.Email.ToLower() == newUserEmail.ToLower());
+            if (emailExists)
+            {
+                errorMessage = "Bu e-posta adresi ile kayıtlı bir hesap zaten bulunuyor.";
+                isSubmitting = false;
+                return;
+            }
+
+            // 1. Yeni Kullanıcıyı oluştur (Guid manuel atandı!)
+            var newUserId = Guid.NewGuid();
+            var user = new User 
+            { 
+                Id = newUserId,
+                Email = newUserEmail, 
+                PasswordHash = newUserPassword, 
+                Role = "Geliştirici" 
+            };
+            db.Users.Add(user);
+
+            // 2. Boş Portfolyoyu oluştur
+            var portfolio = new Portfolio 
+            { 
+                Id = Guid.NewGuid(),
+                UserId = newUserId, 
+                FullName = newUserName, 
+                JobTitle = "Yazılım Geliştirici", 
+                Bio = "Yeni portfolyomu oluşturuyorum.", 
+                ProfileImageUrl = "", 
+                ThemePreference = "Dark"
+            };
+            db.Portfolios.Add(portfolio);
+
+            await db.SaveChangesAsync(); // Transaction bütünlüğü
+
+            // Kayıt başarılı olduğunda kullanıcıyı paneline yönlendir
+            Navigation.NavigateTo("/user/dashboard", forceLoad: false);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Kayıt işlemi sırasında bir sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.";
+            Console.WriteLine($"KAYIT HATASI: {ex.Message}");
+            if (ex.InnerException != null) Console.WriteLine($"DETAY: {ex.InnerException.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+}
