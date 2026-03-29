@@ -27,6 +27,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
         b => b.MigrationsAssembly("DevFolio.Infrastructure")));
 
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+builder.Services.AddScoped<DevFolio.Application.Services.ExportService>();
 
 var app = builder.Build();
 
@@ -71,5 +72,12 @@ app.UseAuthorization();
 app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+app.MapGet("/api/export/{username}", async (string username, DevFolio.Application.Services.ExportService exportService, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env) =>
+{
+    var zipContent = await exportService.GeneratePortfolioZipAsync(username, env.WebRootPath);
+    if (zipContent == null) return Results.NotFound("Kullanıcı bulunamadı.");
+    return Results.File(zipContent, "application/zip", $"{username.ToLower()}-DevFolio.zip");
+});
 
 app.Run();
