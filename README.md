@@ -58,7 +58,7 @@ docker-compose up --build -d
 1. **Repoyu Klonlayın:**
 
 ```bash
-git clone https://github.com/kullaniciadin/DevFolio.git
+git clone https://github.com/halilbsp/DevFolio.git
 cd DevFolio
 ```
 
